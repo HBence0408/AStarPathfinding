@@ -18,15 +18,25 @@ public class Pathfinding : MonoBehaviour
         Node startNode = grid.FindNode(startWorldPos);
         Node targetNode = grid.FindNode(targetWorldPos);
 
-        List<Node> openSet = new List<Node>();
+        MinBinaryHeap<Node> openSet = new MinBinaryHeap<Node>();
         HashSet<Node> closedSet = new HashSet<Node>();
 
-        openSet.Add(startNode);
+        openSet.Insert(startNode);
 
-        while (openSet.Count > 0)
+        while (!openSet.IsEmty)
         {
             //Debug.Log(openSet.Count);
-            Node currentnode = openSet[0];
+            Node currentnode = openSet.ExctractMin();
+
+            /*
+            foreach (Node n in openSet)
+            {
+                if (n < cu)
+                {
+                    currentnode = n;
+                }
+            }
+
             for (int i = 1; i < openSet.Count; i++)
             {
                 if (openSet[i].FCost < currentnode.FCost || openSet[i].FCost == currentnode.FCost && openSet[i].HCost < currentnode.HCost)
@@ -34,8 +44,8 @@ public class Pathfinding : MonoBehaviour
                     currentnode = openSet[i];
                 }
             }
-
-            openSet.Remove(currentnode);
+            */
+           
             closedSet.Add(currentnode);
 
             if (currentnode == targetNode)
@@ -62,16 +72,15 @@ public class Pathfinding : MonoBehaviour
 
                     if (!openSet.Contains(node))
                     {
-                        openSet.Add(node);
+                        openSet.Insert(node);
+                    }
+                    else
+                    {
+                       openSet.UpdateObject(openSet.IndexOfObject(node));
                     }
                 }
             }
-
-            
-
         }
-        
-
     }
 
     private List<Node> RetarcePath(Node start, Node end)

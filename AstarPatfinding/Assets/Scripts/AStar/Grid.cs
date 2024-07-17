@@ -132,6 +132,7 @@ public class PathFinderGrid : MonoBehaviour
                         Debug.Log("pathfinder not null");
                         if (pathfinder.ThePath.Contains(n))
                         {
+                            Debug.Log("should be bllue");
                             Gizmos.color = Color.blue;
                         }
                     }

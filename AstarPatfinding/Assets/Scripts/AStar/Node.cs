@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node
+public class Node: IComparable, ICloneable
 {
     public Node(bool walkable, Vector3 worldPosition, int i, int j)
     {
@@ -31,6 +32,12 @@ public class Node
 
     public override bool Equals(object obj)
     {
+        /*
+        if (this.GetHashCode() != obj.GetHashCode())
+        {
+            return false;
+        }
+        */
         if (obj is null)
         {
             return false;
@@ -53,4 +60,50 @@ public class Node
         
     }
 
+
+    public int CompareTo(object obj)
+    {
+        if (obj == null || obj is not Node)
+        {
+            Debug.LogWarning(obj + " cannot be compared to Node");
+        }
+
+        Node n = obj as Node;
+        if (this.FCost == n.FCost)
+        {
+            if (this.HCost > n.HCost)
+            {
+                return -1;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            if (this.FCost > n.FCost)
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        
+    
+    }
+    
+    public object Clone()
+    {
+        throw new NotImplementedException();
+    }
+
+    /*
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(HCost, FCost);
+    }
+    */
 }
