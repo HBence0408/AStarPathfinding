@@ -25,14 +25,14 @@ public class PathFinderGrid : MonoBehaviour
         return new Vector3(transform.position.x - gridWorldSize.x / 2 + gridCellSize / 2, transform.position.y - gridWorldSize.y / 2 + gridCellSize / 2, 0);
     }
 
-    private void Start()
+    private void Awake()
     {
         GenerateGrid();
     }
 
     private void Update()
     {
-        pathfinder.FindPath(seeker.position, target.position);
+        //pathfinder.FindPath(seeker.position, target.position);
     }
 
     private void GenerateGrid()
@@ -45,6 +45,7 @@ public class PathFinderGrid : MonoBehaviour
 
         for (int i = 0; i < Mathf.RoundToInt(gridWorldSize.x); i++)
         {
+            Debug.Log(grid.Length);
             currentCell.y = bottomLeftCell.y;
             for (int j = 0; j < Mathf.RoundToInt(gridWorldSize.y); j++)
             {
@@ -105,6 +106,7 @@ public class PathFinderGrid : MonoBehaviour
         
     }
 
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(CalculateBottomLeftCell() + new Vector3(gridWorldSize.x * gridCellSize / 2, gridWorldSize.y * gridCellSize / 2, 0), new Vector3(gridWorldSize.x * gridCellSize, gridWorldSize.y * gridCellSize, 1));
@@ -112,7 +114,7 @@ public class PathFinderGrid : MonoBehaviour
         Gizmos.DrawCube(CalculateBottomLeftCell(), new Vector3(gridCellSize, gridCellSize, gridCellSize));
         if (showMeTheMatrix)
         {
-            GenerateGrid();
+            //GenerateGrid();
             
             Gizmos.DrawCube(CalculateBottomLeftCell(), new Vector3(gridCellSize,gridCellSize,gridCellSize));
             if (grid != null)
@@ -126,7 +128,7 @@ public class PathFinderGrid : MonoBehaviour
                         Gizmos.color = Color.blue;
                     }
                     */
-
+                    /*
                     if (pathfinder.ThePath != null)
                     {
                         Debug.Log("pathfinder not null");
@@ -136,6 +138,7 @@ public class PathFinderGrid : MonoBehaviour
                             Gizmos.color = Color.blue;
                         }
                     }
+                    */
                     /*
                     if (PATH != null)
                     {

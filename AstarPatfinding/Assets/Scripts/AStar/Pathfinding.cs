@@ -1,22 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
 {
-
+    /*
     [SerializeField] PathFinderGrid grid;
-    private List<Node> thePath;
-    public List<Node> ThePath
+    public static new Pathfinding Instance;
+
+    private void Awake()
     {
-        get => thePath;
-        
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("multiõle pathfinding script destroying self");
+            Destroy(this.gameObject);
+        }
     }
 
-    public void FindPath(Vector3 startWorldPos, Vector3 targetWorldPos)
+    public void StartPathFinding(Vector3 start, Vector3 end)
+    {
+        StartCoroutine(FindPath(start, end));  
+    }
+
+    private IEnumerator FindPath(Vector3 startWorldPos, Vector3 targetWorldPos)
     {
         Node startNode = grid.FindNode(startWorldPos);
         Node targetNode = grid.FindNode(targetWorldPos);
+        List<Vector3> thePath = null;
 
         MinBinaryHeap<Node> openSet = new MinBinaryHeap<Node>();
         HashSet<Node> closedSet = new HashSet<Node>();
@@ -25,39 +40,20 @@ public class Pathfinding : MonoBehaviour
 
         while (!openSet.IsEmty)
         {
-            //Debug.Log(openSet.Count);
             Node currentnode = openSet.ExctractMin();
-
-            /*
-            foreach (Node n in openSet)
-            {
-                if (n < cu)
-                {
-                    currentnode = n;
-                }
-            }
-
-            for (int i = 1; i < openSet.Count; i++)
-            {
-                if (openSet[i].FCost < currentnode.FCost || openSet[i].FCost == currentnode.FCost && openSet[i].HCost < currentnode.HCost)
-                {
-                    currentnode = openSet[i];
-                }
-            }
-            */
-           
             closedSet.Add(currentnode);
 
             if (currentnode == targetNode)
             {
-                Debug.Log("retracing");
+                //Debug.Log("retracing");
                 thePath = RetarcePath(currentnode, startNode);
-                grid.PATH = RetarcePath(currentnode, startNode);
+                break;
+                //grid.PATH = RetarcePath(currentnode, startNode);
             }
 
             foreach (Node node in grid.FindNeighbours(currentnode))
             {
-                Debug.Log("cheching neighbours");
+                //Debug.Log("cheching neighbours");
                 if (!node.Walkable || closedSet.Contains(node))
                 {
                     continue;
@@ -76,21 +72,32 @@ public class Pathfinding : MonoBehaviour
                     }
                     else
                     {
-                       openSet.UpdateObject(openSet.IndexOfObject(node));
+                        openSet.UpdateObject(openSet.IndexOfObject(node));
                     }
                 }
             }
         }
+
+        yield return null;
+
+        if (thePath != null)
+        {
+            PathProcessingFinished(thePath, true);
+        }
+        else
+        {
+            PathProcessingFinished(thePath, false);
+        }
     }
 
-    private List<Node> RetarcePath(Node start, Node end)
+    private List<Vector3> RetarcePath(Node start, Node end)
     {
-        List<Node> path = new List<Node>();
+        List<Vector3> path = new List<Vector3>();
         Node current = start;
 
         while (current != end)
         {
-            path.Add(current);
+            path.Add(current.WorldPosition);
             current = current.Parent;
         }
         path.Reverse();
@@ -112,5 +119,6 @@ public class Pathfinding : MonoBehaviour
             return 14 * i + 10 * (j - i);
         }
     }
+    */
 
 }
