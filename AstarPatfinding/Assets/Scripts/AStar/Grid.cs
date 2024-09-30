@@ -50,9 +50,9 @@ public class PathFinderGrid : MonoBehaviour
             for (int j = 0; j < Mathf.RoundToInt(gridWorldSize.y); j++)
             {
                 //Debug.Log(i + "    " + j);
-                bool isWalkable = !Physics.CheckBox(currentCell, new Vector3(gridCellSize, gridCellSize, gridCellSize), quaternion.identity, unWalkableLayerMask);
-                isWalkable = !Physics.CheckSphere(currentCell, gridCellSize / 2);
-                isWalkable = !Physics2D.OverlapCircle(new Vector2(currentCell.x, currentCell.y), (gridCellSize / 2)-0.1f,unWalkableLayerMask);
+               // bool isWalkable = !Physics.CheckBox(currentCell, new Vector3(gridCellSize, gridCellSize, gridCellSize), quaternion.identity, unWalkableLayerMask);
+                //isWalkable = !Physics.CheckSphere(currentCell, gridCellSize / 2);
+                bool isWalkable = !Physics2D.OverlapCircle(new Vector2(currentCell.x, currentCell.y), (gridCellSize / 2)-0.1f,unWalkableLayerMask);
                 //Debug.Log(isWalkable);
                 grid[i, j] = new Node(isWalkable,currentCell,i,j);
 
@@ -77,7 +77,7 @@ public class PathFinderGrid : MonoBehaviour
                 }
                 try
                 {
-                    neighbours.Add(grid[node.I + i, node.J + j]);
+                    neighbours.Add(grid[node.I + i, node.J + j].Clone() as Node);
                 }
                 catch (IndexOutOfRangeException)
                 {
@@ -93,10 +93,11 @@ public class PathFinderGrid : MonoBehaviour
 
     public Node FindNode(Vector3 point)
     {
-        bottomLeftCell = CalculateBottomLeftCell();
+       // bottomLeftCell = CalculateBottomLeftCell();
         try
         {
-            return grid[Mathf.RoundToInt( (point.x - bottomLeftCell.x) / gridCellSize),Mathf.RoundToInt( ((point.y) - bottomLeftCell.y) / gridCellSize)];
+           // Debug.Log("finding node");
+            return grid[Mathf.RoundToInt( (point.x - bottomLeftCell.x) / gridCellSize),Mathf.RoundToInt( ((point.y) - bottomLeftCell.y) / gridCellSize)].Clone() as Node;
         }
         catch (Exception)
         {

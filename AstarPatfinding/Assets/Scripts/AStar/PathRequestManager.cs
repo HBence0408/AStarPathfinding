@@ -1,36 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class PathRequestManager : MonoBehaviour
 {
     public static PathRequestManager Instance;
-    private Queue<PathRequest> requestQueue = new Queue<PathRequest>();
-    private bool isProcessing = false;
-    private PathRequest currentRequest;
     [SerializeField] PathFinderGrid grid;
 
-    public bool Isprocessing { get => isProcessing; }
-
-    private struct PathRequest
-    {
-        private Vector3 pathStart;
-        private Vector3 pathEnd;
-        private Action<List<Vector3>, bool> callback;
-
-        public Vector3 PathStart { get => pathStart; }
-        public Vector3 PathEnd { get => pathEnd; }
-        public Action<List<Vector3>, bool> Callback { get => callback; }
-
-        public PathRequest(Vector3 pathStart, Vector3 pathEnd, Action<List<Vector3>, bool> callback)
-        {
-            this.pathStart = pathStart;
-            this.pathEnd = pathEnd;
-            this.callback = callback;
-        }
-    }
+   
 
     private void Awake()
     {
@@ -48,11 +29,22 @@ public class PathRequestManager : MonoBehaviour
     #region requestManager
     public void AddRequest(Vector3 pathStart, Vector3 pathEnd, Action<List<Vector3>,bool> callback)
     {
-        requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
-        Debug.Log("added request");
-        ProcessNext();
+        //requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
+        //Debug.Log("added request");
+        Debug.Log("new path request");
+        Profiler.BeginSample("task");
+        //Task pathfiniding = Task.Run(() => FindPath(new PathRequest(pathStart, pathEnd, callback)));
+        FindPath(new PathRequest(pathStart, pathEnd, callback));
+        Profiler.EndSample();
     }
+    public void AddRequest(PathRequest pathRequest)
+    {
+        //requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
+        //Debug.Log("added request");
+        Task pathfiniding = Task.Run(() => FindPath(pathRequest));
 
+    }
+    /*
     private void ProcessNext()
     {
         if (requestQueue.Count > 0 && !isProcessing)
@@ -60,49 +52,53 @@ public class PathRequestManager : MonoBehaviour
             currentRequest = requestQueue.Dequeue();
             isProcessing = true;
             Debug.Log("starting porcessing");
-            StartCoroutine(FindPath(currentRequest.PathStart, currentRequest.PathEnd));
+            //StartCoroutine(FindPath(currentRequest.PathStart, currentRequest.PathEnd));
             Debug.Log("corutine started");
             //Pathfinding.Instance.StartPathFinding(currentRequest.PathStart,currentRequest.PathEnd);
         }
     }
-
-    private void PathProcessingFinished(List<Vector3> path, bool sucess)
+    */
+    private void PathProcessingFinished(List<Vector3> path, bool sucess, PathRequest pathRequest)
     {
-        Debug.Log("process finished");
-        currentRequest.Callback(path, sucess);
-        Debug.Log("callback sent");
-        isProcessing = false;
-        ProcessNext();
+        //Debug.Log("process finished");
+        pathRequest.Callback(path, sucess);
+        //Debug.Log("callback sent");
+ 
+
     }
     #endregion requestManager
 
     #region pathfinder
-    private IEnumerator FindPath(Vector3 startWorldPos, Vector3 targetWorldPos)
+    public void FindPath(PathRequest pathRequest)
     {
-        Debug.Log("finding path");
-        Node startNode = grid.FindNode(startWorldPos);
-        Node targetNode = grid.FindNode(targetWorldPos);
+        Profiler.BeginSample("pathfinding");
+        //Debug.Log("finding path");
+        Node startNode = grid.FindNode(pathRequest.PathStart);
+        Node targetNode = grid.FindNode(pathRequest.PathEnd);
         List<Vector3> thePath = null;
-
+       //Debug.Log("start node, target node , path created");
         if (!startNode.Walkable || !targetNode.Walkable )
         {
-            PathProcessingFinished(thePath, false);
-            yield break;
+            PathProcessingFinished(thePath, false,pathRequest);
+            Profiler.EndSample();
+            return;
         }
 
         MinBinaryHeap<Node> openSet = new MinBinaryHeap<Node>();
         HashSet<Node> closedSet = new HashSet<Node>();
 
         openSet.Insert(startNode);
-
+       // Debug.Log("while start");
         while (!openSet.IsEmty)
         {
+            //Debug.Log("in while");
             Node currentnode = openSet.ExctractMin();
+            //Debug.Log(currentnode.I + " " + currentnode.J+ " " + targetNode.I + " " + targetNode.J);
             closedSet.Add(currentnode);
 
-            if (currentnode == targetNode)
+            if (currentnode.Equals( targetNode))
             {
-                Debug.Log("retracing");
+                //Debug.Log("retracing");
                 thePath = RetarcePath(startNode, currentnode);
                 break;
                 //grid.PATH = RetarcePath(currentnode, startNode);
@@ -114,6 +110,10 @@ public class PathRequestManager : MonoBehaviour
                 if (!node.Walkable || closedSet.Contains(node))
                 {
                     continue;
+                }
+                if (closedSet.Contains(node))
+                {
+                    //Debug.Log("closed");
                 }
 
                 int newMovementCost = currentnode.GCost + GetGridDistance(node, currentnode);
@@ -135,15 +135,15 @@ public class PathRequestManager : MonoBehaviour
             }
         }
 
-        yield return null;
+        
 
         if (thePath != null)
         {
-            PathProcessingFinished(thePath, true);
+            PathProcessingFinished(thePath, true, pathRequest);
         }
         else
         {
-            PathProcessingFinished(thePath, false);
+            PathProcessingFinished(thePath, false, pathRequest);
         }
     }
 

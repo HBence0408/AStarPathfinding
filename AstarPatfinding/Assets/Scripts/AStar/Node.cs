@@ -97,7 +97,8 @@ public class Node: IComparable, ICloneable
     
     public object Clone()
     {
-        throw new NotImplementedException();
+        Node n = new Node(this.walkable, this.worldPosition, this.i, this.j);
+        return n;
     }
 
     /*
