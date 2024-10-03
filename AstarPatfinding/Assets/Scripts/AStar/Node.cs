@@ -101,6 +101,11 @@ public class Node: IComparable, ICloneable
         return n;
     }
 
+    public override int GetHashCode()
+    {
+        return worldPosition.GetHashCode();
+    }
+
     /*
     public override int GetHashCode()
     {

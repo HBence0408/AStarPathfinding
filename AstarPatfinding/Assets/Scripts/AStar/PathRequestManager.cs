@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.UI.CanvasScaler;
 
 public class PathRequestManager : MonoBehaviour
 {
     public static PathRequestManager Instance;
     [SerializeField] PathFinderGrid grid;
-
-   
+    private Queue<PathRequest> requests = new Queue<PathRequest>();
+    [SerializeField] private int requestProcessedIn1Frame;
+    private PathRequest currentRequest;
+    [SerializeField] private Transform target;
 
     private void Awake()
     {
@@ -30,34 +34,54 @@ public class PathRequestManager : MonoBehaviour
     public void AddRequest(Vector3 pathStart, Vector3 pathEnd, Action<List<Vector3>,bool> callback)
     {
         //requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
-        //Debug.Log("added request");
-        Debug.Log("new path request");
-        Profiler.BeginSample("task");
+        //Debug.Log("added requests");
+        //Debug.Log("new path requests");
+       // Profiler.BeginSample("adding task");
         //Task pathfiniding = Task.Run(() => FindPath(new PathRequest(pathStart, pathEnd, callback)));
-        FindPath(new PathRequest(pathStart, pathEnd, callback));
-        Profiler.EndSample();
+        //FindPath(new PathRequest(pathStart, pathEnd, callback));
+
+
+        
+
+       // Profiler.EndSample();
     }
     public void AddRequest(PathRequest pathRequest)
     {
         //requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
-        //Debug.Log("added request");
-        Task pathfiniding = Task.Run(() => FindPath(pathRequest));
+        //Debug.Log("added requests");
+        //Task pathfiniding = Task.Run(() => FindPath(pathRequest));
 
+        requests.Enqueue(pathRequest);
+
+        /*
+        PathRequest requests = new PathRequest(unit.position, target.position, unitScript.OnPathFound);
+        Task pathfiniding = Task.Run(() => PathRequestManager.Instance.FindPath(requests));
+        */
     }
-    /*
-    private void ProcessNext()
+    
+    private void ProcessRequests()
     {
-        if (requestQueue.Count > 0 && !isProcessing)
+        for (int i = 0; i < requestProcessedIn1Frame; i++)
         {
-            currentRequest = requestQueue.Dequeue();
-            isProcessing = true;
-            Debug.Log("starting porcessing");
-            //StartCoroutine(FindPath(currentRequest.PathStart, currentRequest.PathEnd));
-            Debug.Log("corutine started");
-            //Pathfinding.Instance.StartPathFinding(currentRequest.PathStart,currentRequest.PathEnd);
+            Profiler.BeginSample("dequeue task");
+            if (requests.Count > 0)
+            {
+                currentRequest = requests.Dequeue();
+                currentRequest.pathEnd = target.position;
+                Task pathfiniding = Task.Run(() => PathRequestManager.Instance.FindPath(currentRequest));
+            }
+            Profiler.EndSample();
+
         }
     }
-    */
+
+    private void Update()
+    {
+        ProcessRequests();
+    }
+    
+
+
     private void PathProcessingFinished(List<Vector3> path, bool sucess, PathRequest pathRequest)
     {
         //Debug.Log("process finished");

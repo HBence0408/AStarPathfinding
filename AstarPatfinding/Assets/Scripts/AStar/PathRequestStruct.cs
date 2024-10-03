@@ -6,7 +6,7 @@ using UnityEngine;
 public struct PathRequest
 {
     private Vector3 pathStart;
-    private Vector3 pathEnd;
+    public Vector3 pathEnd;
     private Action<List<Vector3>, bool> callback;
 
     public Vector3 PathStart { get => pathStart; }

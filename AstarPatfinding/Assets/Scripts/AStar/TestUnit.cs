@@ -10,18 +10,22 @@ public class TestUnit : MonoBehaviour
 {
     [SerializeField] private float speed;
     [SerializeField] private Transform target;
-    private static List<TestUnit> Units = new List<TestUnit>(); 
+   // private static List<TestUnit> Units = new List<TestUnit>(); 
     private List<Vector3> path;
-    private bool followPath = false;
+    [SerializeField] private bool followPath = false;
     private int pathIndex;
-    private bool requestNewPath = true;
+    public bool requestNewPath = true;
     //private Action<List<Vector3>, bool> callback;
     private Vector3 targetPos;
     private Vector3 pos;
+    public SeekerData data;
+    public bool WaitingForPath = false;
+    //public TestUnit script { get => this; }
+
 
     private void Awake()
     {
-        Units.Add(this);
+       // Units.Add(this);
         //callback = OnPathFound;
     }
 
@@ -32,28 +36,39 @@ public class TestUnit : MonoBehaviour
        // PathRequestManager.Instance.AddRequest(this.transform.position, target.position, OnPathFound);
     }
 
-    void Update()
+    public void Poll()
     {
-        Profiler.BeginSample("requesting path");
+        //Profiler.BeginSample("requesting path");
+        /*
         if (requestNewPath)
         {
             //targetPos = target.transform.position;
             //pos = this.transform.position;
-            Debug.Log("requesting");
-            PathRequest request = new PathRequest(this.transform.position, target.position, OnPathFound);
-            Task pathfiniding = Task.Run(() => PathRequestManager.Instance.FindPath(request));
-            //Task pathfinding = Task.Run( () => PathRequestManager.Instance.FindPath(new PathRequest( this.transform.position, target.position, OnPathFound)));
+           // Debug.Log("requesting");
+            PathRequest requests = new PathRequest(this.transform.position, target.position, OnPathFound);
+            //Task pathfiniding = Task.Run(() => PathRequestManager.Instance.FindPath(requests));
+            Task pathfinding = Task.Run( () => PathRequestManager.Instance.FindPath(new PathRequest( this.transform.position, target.position, OnPathFound)));
+            //PathRequestManager.Instance.FindPath(new PathRequest(this.transform.position, target.position, OnPathFound));
             requestNewPath = false;
         }
-        Profiler.EndSample();
+        //Profiler.EndSample();
         //PathRequestManager.Instance.AddRequest(this.transform.position, target.position, OnPathFound);
-
+        */
         if (followPath)
         {
             FollowPath();
         } 
     }
 
+    private void Updatdfghjke()
+    {
+        if (followPath)
+        {
+            FollowPath();
+        }
+    }
+
+    /*
     public static void TargetPathChange()
     {
         foreach (TestUnit unit in Units)
@@ -61,18 +76,25 @@ public class TestUnit : MonoBehaviour
             unit.requestNewPath = true;
         }
     }
-
-    private void OnPathFound(List<Vector3> path, bool pathFound)
+    */
+    public void OnPathFound(List<Vector3> path, bool pathFound)
     {
         if (!pathFound)
         {
             return;
         }
         //Debug.Log("path recieved, starting corutine");
+        WaitingForPath = false;
         this.path = path;
         pathIndex = 0;
         followPath = true;
+
        
+    }
+
+    public void SetPath()
+    {
+
     }
 
     private void FollowPath()

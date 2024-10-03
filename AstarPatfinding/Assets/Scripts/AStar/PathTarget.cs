@@ -24,7 +24,7 @@ public class PathTarget : MonoBehaviour
         if (!currentNodePos.Equals(previousNodePos) && time > 0.1)
         {
             time = 0;
-            TestUnit.TargetPathChange();
+            SeekerManager.Instance.TargetPathChange();
         }
         else
         {
