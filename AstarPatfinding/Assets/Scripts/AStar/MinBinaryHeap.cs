@@ -60,7 +60,6 @@ internal class MinBinaryHeap<T> : IEnumerable where T : IComparable
             if (heapList[i].CompareTo(current) > 0)
             {
                 T temp = current;
-                //Console.WriteLine("the chidren index " + ChildrenIndex[i]);
                 heapList[currentIndex] = heapList[ChildrenIndex[i]];
                 heapList[ChildrenIndex[i]] = current;
                 break;

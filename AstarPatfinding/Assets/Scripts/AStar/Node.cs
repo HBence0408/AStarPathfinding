@@ -32,13 +32,11 @@ public class Node: IComparable, ICloneable
 
     public override bool Equals(object obj)
     {
-        /*
-        if (this.GetHashCode() != obj.GetHashCode())
+        if (obj is null )
         {
             return false;
         }
-        */
-        if (obj is null)
+        if (obj.GetHashCode() != this.GetHashCode())
         {
             return false;
         }
@@ -56,10 +54,8 @@ public class Node: IComparable, ICloneable
         else
         {
             return false;
-        }
-        
+        }    
     }
-
 
     public int CompareTo(object obj)
     {
@@ -91,8 +87,6 @@ public class Node: IComparable, ICloneable
                 return -1;
             }
         }
-        
-    
     }
     
     public object Clone()
@@ -105,11 +99,4 @@ public class Node: IComparable, ICloneable
     {
         return worldPosition.GetHashCode();
     }
-
-    /*
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(HCost, FCost);
-    }
-    */
 }

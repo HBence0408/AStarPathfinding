@@ -12,9 +12,7 @@ public class PathRequestManager : MonoBehaviour
 {
     public static PathRequestManager Instance;
     [SerializeField] PathFinderGrid grid;
-    private Queue<PathRequest> requests = new Queue<PathRequest>();
     [SerializeField] private int requestProcessedIn1Frame;
-    private PathRequest currentRequest;
     [SerializeField] private Transform target;
 
     private void Awake()
@@ -25,82 +23,23 @@ public class PathRequestManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("multiple pathrequest magers, destrtoying self");
+            Debug.LogWarning("multiple pathrequest managers, destrtoying self");
             Destroy(this.gameObject);
         }
     }
 
-    #region requestManager
-    public void AddRequest(Vector3 pathStart, Vector3 pathEnd, Action<List<Vector3>,bool> callback)
-    {
-        //requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
-        //Debug.Log("added requests");
-        //Debug.Log("new path requests");
-       // Profiler.BeginSample("adding task");
-        //Task pathfiniding = Task.Run(() => FindPath(new PathRequest(pathStart, pathEnd, callback)));
-        //FindPath(new PathRequest(pathStart, pathEnd, callback));
-
-
-        
-
-       // Profiler.EndSample();
-    }
-    public void AddRequest(PathRequest pathRequest)
-    {
-        //requestQueue.Enqueue(new PathRequest(pathStart, pathEnd, callback));
-        //Debug.Log("added requests");
-        //Task pathfiniding = Task.Run(() => FindPath(pathRequest));
-
-        requests.Enqueue(pathRequest);
-
-        /*
-        PathRequest requests = new PathRequest(unit.position, target.position, unitScript.OnPathFound);
-        Task pathfiniding = Task.Run(() => PathRequestManager.Instance.FindPath(requests));
-        */
-    }
-    
-    private void ProcessRequests()
-    {
-        for (int i = 0; i < requestProcessedIn1Frame; i++)
-        {
-            Profiler.BeginSample("dequeue task");
-            if (requests.Count > 0)
-            {
-                currentRequest = requests.Dequeue();
-                currentRequest.pathEnd = target.position;
-                Task pathfiniding = Task.Run(() => PathRequestManager.Instance.FindPath(currentRequest));
-            }
-            Profiler.EndSample();
-
-        }
-    }
-
-    private void Update()
-    {
-        ProcessRequests();
-    }
-    
-
-
     private void PathProcessingFinished(List<Vector3> path, bool sucess, PathRequest pathRequest)
     {
-        //Debug.Log("process finished");
         pathRequest.Callback(path, sucess);
-        //Debug.Log("callback sent");
- 
-
     }
-    #endregion requestManager
 
-    #region pathfinder
     public void FindPath(PathRequest pathRequest)
     {
         Profiler.BeginSample("pathfinding");
-        //Debug.Log("finding path");
         Node startNode = grid.FindNode(pathRequest.PathStart);
         Node targetNode = grid.FindNode(pathRequest.PathEnd);
         List<Vector3> thePath = null;
-       //Debug.Log("start node, target node , path created");
+
         if (!startNode.Walkable || !targetNode.Walkable )
         {
             PathProcessingFinished(thePath, false,pathRequest);
@@ -112,32 +51,24 @@ public class PathRequestManager : MonoBehaviour
         HashSet<Node> closedSet = new HashSet<Node>();
 
         openSet.Insert(startNode);
-       // Debug.Log("while start");
+
         while (!openSet.IsEmty)
         {
-            //Debug.Log("in while");
             Node currentnode = openSet.ExctractMin();
-            //Debug.Log(currentnode.I + " " + currentnode.J+ " " + targetNode.I + " " + targetNode.J);
+
             closedSet.Add(currentnode);
 
             if (currentnode.Equals( targetNode))
             {
-                //Debug.Log("retracing");
                 thePath = RetarcePath(startNode, currentnode);
                 break;
-                //grid.PATH = RetarcePath(currentnode, startNode);
             }
 
             foreach (Node node in grid.FindNeighbours(currentnode))
             {
-                //Debug.Log("cheching neighbours");
                 if (!node.Walkable || closedSet.Contains(node))
                 {
                     continue;
-                }
-                if (closedSet.Contains(node))
-                {
-                    //Debug.Log("closed");
                 }
 
                 int newMovementCost = currentnode.GCost + GetGridDistance(node, currentnode);
@@ -158,8 +89,6 @@ public class PathRequestManager : MonoBehaviour
                 }
             }
         }
-
-        
 
         if (thePath != null)
         {
@@ -221,7 +150,6 @@ public class PathRequestManager : MonoBehaviour
             return 14 * i + 10 * (j - i);
         }
     }
-    #endregion pathfinder
 }
 
 

@@ -14,23 +14,24 @@ public class PathTarget : MonoBehaviour
         currentNodePos = grid.FindNode(this.transform.position);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
         previousNodePos = currentNodePos;
         currentNodePos = grid.FindNode(this.transform.position);
-
-        if (!currentNodePos.Equals(previousNodePos) && time > 0.1)
+        time = PulseSeekers(currentNodePos, previousNodePos,time);
+    }
+    
+    private double PulseSeekers(Node currentPosition, Node previousPosition, double checkTime)
+    {
+        if (!currentPosition.Equals(previousPosition) && checkTime > 0.1)
         {
-            time = 0;
+            checkTime = 0;
             SeekerManager.Instance.TargetPathChange();
         }
         else
         {
-            time += Time.deltaTime;
+            checkTime += Time.deltaTime;
         }
-        
-
+        return checkTime;
     }
 }

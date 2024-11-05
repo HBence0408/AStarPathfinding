@@ -12,13 +12,7 @@ public class PathFinderGrid : MonoBehaviour
     [SerializeField] private LayerMask walkableLayerMask;
     [SerializeField] private LayerMask unWalkableLayerMask;
     [SerializeField] private Vector3 bottomLeftCell;
-    [SerializeField] private Transform destination;
     [SerializeField] private bool showMeTheMatrix;
-
-    public List<Node> PATH;
-
-    [SerializeField] Transform seeker, target;
-    [SerializeField] Pathfinding pathfinder;
 
     private Vector3 CalculateBottomLeftCell()
     {
@@ -30,18 +24,11 @@ public class PathFinderGrid : MonoBehaviour
         GenerateGrid();
     }
 
-    private void Update()
-    {
-        //pathfinder.FindPath(seeker.position, target.position);
-    }
-
     private void GenerateGrid()
     {
         grid = new Node[Mathf.RoundToInt(gridWorldSize.x), Mathf.RoundToInt(gridWorldSize.y)];
         bottomLeftCell = CalculateBottomLeftCell();
         Vector3 currentCell = CalculateBottomLeftCell();
-
-        //Debug.Log(Mathf.RoundToInt(gridWorldSize.x) + "   "+ Mathf.RoundToInt(gridWorldSize.y));
 
         for (int i = 0; i < Mathf.RoundToInt(gridWorldSize.x); i++)
         {
@@ -49,18 +36,13 @@ public class PathFinderGrid : MonoBehaviour
             currentCell.y = bottomLeftCell.y;
             for (int j = 0; j < Mathf.RoundToInt(gridWorldSize.y); j++)
             {
-                //Debug.Log(i + "    " + j);
-               // bool isWalkable = !Physics.CheckBox(currentCell, new Vector3(gridCellSize, gridCellSize, gridCellSize), quaternion.identity, unWalkableLayerMask);
-                //isWalkable = !Physics.CheckSphere(currentCell, gridCellSize / 2);
                 bool isWalkable = !Physics2D.OverlapCircle(new Vector2(currentCell.x, currentCell.y), (gridCellSize / 2)-0.1f,unWalkableLayerMask);
-                //Debug.Log(isWalkable);
                 grid[i, j] = new Node(isWalkable,currentCell,i,j);
 
                 currentCell.y += gridCellSize;
             }
             currentCell.x += gridCellSize;
         }
-
     }
 
     public List<Node> FindNeighbours(Node node)
@@ -83,30 +65,24 @@ public class PathFinderGrid : MonoBehaviour
                 {
 
                     continue;
-                }
-                
+                }  
             }
         }
-
         return neighbours;
     }
 
     public Node FindNode(Vector3 point)
     {
-       // bottomLeftCell = CalculateBottomLeftCell();
         try
         {
-           // Debug.Log("finding node");
             return grid[Mathf.RoundToInt( (point.x - bottomLeftCell.x) / gridCellSize),Mathf.RoundToInt( ((point.y) - bottomLeftCell.y) / gridCellSize)].Clone() as Node;
         }
         catch (Exception)
         {
             Debug.LogWarning("an error has ocured finding the node at: " + point.x + " " + point.y);
             return null;
-        }
-        
+        } 
     }
-
 
     private void OnDrawGizmos()
     {
@@ -115,60 +91,16 @@ public class PathFinderGrid : MonoBehaviour
         Gizmos.DrawCube(CalculateBottomLeftCell(), new Vector3(gridCellSize, gridCellSize, gridCellSize));
         if (showMeTheMatrix)
         {
-            //GenerateGrid();
-            
             Gizmos.DrawCube(CalculateBottomLeftCell(), new Vector3(gridCellSize,gridCellSize,gridCellSize));
             if (grid != null)
             {
                 foreach (Node n in grid)
                 {
                     Gizmos.color = n.Walkable ? Color.white : Color.red;
-                    /*
-                    if (FindNode(destination.position) != null && FindNode(destination.position) == n)
-                    {
-                        Gizmos.color = Color.blue;
-                    }
-                    */
-                    /*
-                    if (pathfinder.ThePath != null)
-                    {
-                        Debug.Log("pathfinder not null");
-                        if (pathfinder.ThePath.Contains(n))
-                        {
-                            Debug.Log("should be bllue");
-                            Gizmos.color = Color.blue;
-                        }
-                    }
-                    */
-                    /*
-                    if (PATH != null)
-                    {
-                        Debug.Log("pathfinder not null");
-                        if (PATH.Contains(n)) 
-                        {
-                            Debug.Log("path contains current node should be green");
-                            Gizmos.color = Color.green;
-                        }
-                    }
-                    */
                     Gizmos.DrawCube(n.WorldPosition, new Vector3(gridCellSize / 2, gridCellSize / 2, gridCellSize));
                 }
-                /*
-                if (PATH != null)
-                {
-                    Debug.Log(PATH.Count);
-                    foreach (Node n in PATH)
-                    {
-                        Debug.Log("drawing path");
-                        Gizmos.color = Color.green;
-                        Gizmos.DrawCube(n.WorldPosition, new Vector3(gridCellSize / 2, gridCellSize / 2, gridCellSize));
-                    }
-                }
-                */
-
             }
-            Gizmos.color = Color.black;
-            
+            Gizmos.color = Color.black;   
         }
     }
 }

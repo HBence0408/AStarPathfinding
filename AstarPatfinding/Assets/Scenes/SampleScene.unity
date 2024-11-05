@@ -160,11 +160,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   bottomLeftCell: {x: -10.78, y: -10.27, z: 0}
-  destination: {fileID: 0}
   showMeTheMatrix: 1
-  seeker: {fileID: 1954464294}
-  target: {fileID: 1553415797}
-  pathfinder: {fileID: 0}
 --- !u!4 &35491879
 Transform:
   m_ObjectHideFlags: 0
@@ -454,7 +450,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 638795031}
-  - component: {fileID: 638795030}
   - component: {fileID: 638795032}
   m_Layer: 0
   m_Name: Pathfinder
@@ -463,18 +458,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &638795030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 638795029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6303ed79eb5ef6b48bfe4db551d66595, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &638795031
 Transform:
   m_ObjectHideFlags: 0
@@ -6828,11 +6811,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f7e71972b03c184aaf1e025271daa74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.1
+  speed: 2
   target: {fileID: 1553415797}
   followPath: 0
-  requestNewPath: 1
-  WaitingForPath: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
