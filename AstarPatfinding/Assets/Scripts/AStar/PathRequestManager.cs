@@ -10,10 +10,10 @@ using static UnityEngine.UI.CanvasScaler;
 
 public class PathRequestManager : MonoBehaviour
 {
-    public static PathRequestManager Instance;
+    
     [SerializeField] PathFinderGrid grid;
-    [SerializeField] private int requestProcessedIn1Frame;
-    [SerializeField] private Transform target;
+    //[SerializeField] private int requestProcessedIn1Frame;
+    public static PathRequestManager Instance;
 
     private void Awake()
     {

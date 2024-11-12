@@ -6,4 +6,6 @@ public interface ISeeker
 {
     void OnPathFound(List<Vector3> path, bool pathFound);
     void Poll();
+    void SetData(SeekerData data);
+    void SetTarget(Transform target);
 }

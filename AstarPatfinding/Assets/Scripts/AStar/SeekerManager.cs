@@ -4,6 +4,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
 using System.Threading.Tasks;
+using UnityEngine.UIElements;
+using System.Threading;
 
 public class SeekerManager : MonoBehaviour
 {
@@ -15,6 +17,11 @@ public class SeekerManager : MonoBehaviour
     private SeekerData[] seekerDatas = new SeekerData[maxSeekers];
     //private bool requestNewPath = true;
     [SerializeField] private Transform target;
+    private IntStack freeSpaces = new IntStack(maxSeekers);
+    private List<int> free2 = new List<int>();
+    [SerializeField] private int deadSeekers = 0;
+    [SerializeField] private int currentSeekers = 0;
+    private Quaternion rotation;
     private int iterations = 0;
     private  int Iterations
     {
@@ -40,29 +47,102 @@ public class SeekerManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            rotation = this.transform.rotation;
         }
         else
         {
             Debug.LogWarning("multiple seeker managers, destroying self");
             Destroy(this);
         }
+
+        for (int i = maxSeekers-1; i >= 0; i--)
+        {
+            freeSpaces.Push(i);
+           // Debug.Log("pushed "+i);
+        }
     }
 
+
+    // ez spawner tulajdonság, külön spawner kell
+
+    
     private void Start()
     {
+        /*
         for (int i = 0; i < maxSeekers; i++)
         {
             GameObject go = Instantiate(seeker, this.transform.position, this.transform.rotation);
             go.name = ("seeker" + i).ToString();
-            seekers[i] = go.GetComponent<TestUnit>();
+            seekers[i] = go.GetComponent<ISeeker>();
             seekerDatas[i] = new SeekerData(go.transform, target, seekers[i]);
         }
+        */
+    }
+    
+    public void AddSeeker(Vector3 posisiton)
+    {
+        int seekerIndex = -10;
+        for (int i = 0; i < maxSeekers; i++)
+        {
+            if (seekers[i] == null)
+            {
+                seekerIndex = i;
+                Debug.Log("index:" + seekerIndex);
+            }
+        }
+        if (seekerIndex == -10)
+        {
+            return;
+        }
+        GameObject go = Instantiate(seeker, posisiton, rotation);
+        go.name = ("seeker " + seekerIndex).ToString();
+        seekers[seekerIndex] = go.GetComponent<ISeeker>();
+        seekers[seekerIndex].SetTarget(target);
+       // Debug.Log("spawning transfor:" + go.transform);
+        seekerDatas[seekerIndex] = new SeekerData(go.transform, target, seekers[seekerIndex]);
+        currentSeekers++;
+        //return (seekerDatas[seekerIndex], seekers[seekerIndex]);
+    }
+
+    
+
+    /*
+    public void DestroySeekerData(ISeeker seeker)
+    {
+        for (int i = 0; i < maxSeekers; i++)
+        {
+            if (seekers[i].Equals(seeker))
+            {
+                freeSpaces.Push(i);
+                return;
+            }
+        }
+    }
+    */
+    public void DestroySeeker(SeekerData seeker)
+    {
+        
+        for (int i = 0; i < maxSeekers; i++)
+        {
+            if (seekerDatas[i].Equals(seeker))
+            {
+
+                seekers[i] = null;
+                seekerDatas[i].DeleteScript();
+                // seekerDatas[i].IsAlive = false;
+                //freeSpaces.Push(i);
+                deadSeekers++;
+                UIManager.Instance.AddPoint();
+                return;
+            }
+        }  
     }
 
     public void TargetPathChange()
     {
         for (int i = 0; i < maxSeekers; i++)
         {
+            Debug.Log("new pazh");
             seekerDatas[i].requestPath = true;
         } 
     }
@@ -71,12 +151,19 @@ public class SeekerManager : MonoBehaviour
     { 
         for (int i = 0; i < maxSeekers; i++)
         {
-            seekers[i].Poll();
+            if (seekers[i] != null)
+            {
+                seekers[i].Poll();
+            }
         }
         
         for (int i = 0; i < 100; i++)
-        {;
-            seekerDatas[Iterations].Update();
+        {
+            if (seekers[Iterations] != null)
+            {
+                seekerDatas[Iterations].Update();
+                Debug.Log("update");
+            }
             Iterations++;
         }
     }
