@@ -9,6 +9,37 @@ public class Player : MonoBehaviour
     [SerializeField] private int speed;
     [SerializeField] private int maxSpeed;
     [SerializeField] private GameObject projectile;
+    [SerializeField] private int health;
+    [SerializeField] private static Player instance;
+    [SerializeField] private float experiencePoint;
+    public int Health { get => health; 
+        private set
+        {
+            health = value;
+            UIManager.Instance.UpdateHealthUI(health);
+            if (health < 1)
+            {
+                //dead
+            }
+        }
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("multiple player");
+        }
+    }
+
+    private void Start()
+    {
+        UIManager.Instance.UpdateHealthUI(health);
+    }
 
     // Update is called once per frame
     void Update()
@@ -47,6 +78,11 @@ public class Player : MonoBehaviour
         {
             
         }
+    }
+
+    public static void GetHit()
+    {
+        instance.Health--;
     }
 
     private void Shoot()

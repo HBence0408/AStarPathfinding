@@ -12,6 +12,7 @@ public class Projectile : MonoBehaviour
     {
         this.dir = dir;
         this.damage = damage;
+        transform.up = dir;
     }
 
     private void Update()

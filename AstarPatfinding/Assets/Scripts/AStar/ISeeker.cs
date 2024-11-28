@@ -8,4 +8,6 @@ public interface ISeeker
     void Poll();
     void SetData(SeekerData data);
     void SetTarget(Transform target);
+    void SetActive(bool isActive);
+    bool IsActive();
 }

@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private Text text;
+    [SerializeField] private Text pointsText;
+    [SerializeField] private Text hpText;
 
     private static UIManager instance = null;
     public static UIManager Instance { get => instance; }
@@ -25,7 +26,17 @@ public class UIManager : MonoBehaviour
 
     public void AddPoint()
     {
-        text.text = (int.Parse(text.text) + 1).ToString();
+        pointsText.text = (int.Parse(pointsText.text) + 1).ToString();
+    }
+
+    public void UpdateHealthUI(int hp)
+    {
+        hpText.text = hp.ToString();
+    }
+
+    public void SetDeathScreen()
+    {
+
     }
 
 }

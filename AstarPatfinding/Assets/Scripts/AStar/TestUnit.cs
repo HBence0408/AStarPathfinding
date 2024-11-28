@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
+using static UnityEngine.Rendering.DebugUI;
 
 public class TestUnit : MonoBehaviour, ISeeker
 {
@@ -16,7 +17,14 @@ public class TestUnit : MonoBehaviour, ISeeker
     private int pathIndex;
     public SeekerData data;
     private bool isReady = false;
-   // public SeekerData Data { get => data; }
+    private bool isActive;
+
+    public bool IsActive()
+    {
+         return isActive;  
+    }
+
+    // public SeekerData Data { get => data; }
 
     private void Update()
     {
@@ -90,6 +98,20 @@ public class TestUnit : MonoBehaviour, ISeeker
        
     }
 
+    public void SetActive(bool isActive)
+    {
+        if (isActive)
+        {
+            this.gameObject.SetActive(true);
+            this.isActive = true;
+        }
+        else
+        {
+            this.isActive = false;
+            this.gameObject.SetActive(false);
+        }
+    }
+
     public void SetTarget(Transform target)
     {
         this.target = target;
@@ -108,8 +130,17 @@ public class TestUnit : MonoBehaviour, ISeeker
         if (collision.gameObject.tag == "Projectile")
         {
             Destroy(collision.gameObject);
-            SeekerManager.Instance.DestroySeeker(data);
-            Destroy(this.gameObject);
+            //SeekerManager.Instance.DestroySeeker();
+            SetActive(false);
+            UIManager.Instance.AddPoint();
+            //Destroy(this.gameObject);
+        }
+        if (collision.gameObject.tag == "Player")
+        {
+            Player.GetHit();
+            SetActive(false);
+            //SeekerManager.Instance.DestroySeeker(data);
+            //Destroy(this.gameObject);
         }
 
     }

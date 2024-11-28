@@ -57,6 +57,11 @@ public struct SeekerData
         }
     }
 
+    public void TeleportToPosition(Vector3 pos)
+    {
+        unit.position = pos;
+    }
+
     public override bool Equals(object obj)
     {
         if (obj == null)

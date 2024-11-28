@@ -68,32 +68,38 @@ public class SeekerManager : MonoBehaviour
     
     private void Start()
     {
-        /*
+        // object pooling   
         for (int i = 0; i < maxSeekers; i++)
         {
             GameObject go = Instantiate(seeker, this.transform.position, this.transform.rotation);
             go.name = ("seeker" + i).ToString();
             seekers[i] = go.GetComponent<ISeeker>();
             seekerDatas[i] = new SeekerData(go.transform, target, seekers[i]);
+            seekers[i].SetTarget(target);
+            seekers[i].SetActive(false);
         }
-        */
+        
     }
     
     public void AddSeeker(Vector3 posisiton)
     {
+        
         int seekerIndex = -10;
         for (int i = 0; i < maxSeekers; i++)
         {
-            if (seekers[i] == null)
+            if (!seekers[i].IsActive())
             {
                 seekerIndex = i;
-                Debug.Log("index:" + seekerIndex);
             }
         }
         if (seekerIndex == -10)
         {
             return;
         }
+        seekers[seekerIndex].SetActive(true);
+        seekerDatas[seekerIndex].TeleportToPosition(posisiton);
+
+        /*
         GameObject go = Instantiate(seeker, posisiton, rotation);
         go.name = ("seeker " + seekerIndex).ToString();
         seekers[seekerIndex] = go.GetComponent<ISeeker>();
@@ -102,6 +108,7 @@ public class SeekerManager : MonoBehaviour
         seekerDatas[seekerIndex] = new SeekerData(go.transform, target, seekers[seekerIndex]);
         currentSeekers++;
         //return (seekerDatas[seekerIndex], seekers[seekerIndex]);
+        */
     }
 
     
@@ -119,20 +126,24 @@ public class SeekerManager : MonoBehaviour
         }
     }
     */
-    public void DestroySeeker(SeekerData seeker)
+    public void DestroySeeker(ISeeker seeker)
     {
         
         for (int i = 0; i < maxSeekers; i++)
         {
-            if (seekerDatas[i].Equals(seeker))
+            if (seekers[i].Equals(seeker))
             {
-
+                seekers[i].SetActive(false);
+                /*
                 seekers[i] = null;
                 seekerDatas[i].DeleteScript();
                 // seekerDatas[i].IsAlive = false;
                 //freeSpaces.Push(i);
                 deadSeekers++;
-                UIManager.Instance.AddPoint();
+                
+                return;
+                */
+                //UIManager.Instance.AddPoint();
                 return;
             }
         }  
@@ -151,7 +162,7 @@ public class SeekerManager : MonoBehaviour
     { 
         for (int i = 0; i < maxSeekers; i++)
         {
-            if (seekers[i] != null)
+            if (seekers[i].IsActive())
             {
                 seekers[i].Poll();
             }
@@ -159,7 +170,7 @@ public class SeekerManager : MonoBehaviour
         
         for (int i = 0; i < 100; i++)
         {
-            if (seekers[Iterations] != null)
+            if (seekers[Iterations].IsActive())
             {
                 seekerDatas[Iterations].Update();
                 Debug.Log("update");
